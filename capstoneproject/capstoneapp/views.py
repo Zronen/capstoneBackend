@@ -8,6 +8,7 @@ import re
 globalChat = []
 
 def index(request):
+    #render
     return render(request, 'index.html')
 
 def askQuestion(request):
