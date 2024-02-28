@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Capstone App</title>
+</head>
+<body>
+<h1>Capstone App</h1>
+<h3>Ask question</h3>
+<form action="/askQuestion/" method="post">
+    {% csrf_token %}
+        <input type="text" id="submitField" name="submitField" required="required" size="70" value="safety passwords">
+    <br/>
+    <br/>
+    <input type="submit" value="submit">
+
+</form>
+
+<div>
+    <h3>Server Response</h3>
+    {% for item in itemList %}
+    <p>
+        <li><u> {{ item.siteName }} </u></li>
+        <li> {{ item.siteURL }} </li>
+    </p>
+    {% endfor %}
+
+</div>
+
+<div>
+    <h3>Chatbox</h3>
+    {% for item in chatLog %}
+    <li>{{ item }}</li>
+    {% endfor %}
+
+</div>
+
+</body>
+
+<style>
+    body {background-color: black;}
+    body {color: white;}
+</style>
+
+</html>
