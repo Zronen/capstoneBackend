@@ -36,8 +36,10 @@ def askQuestion(request):
     return render(request, 'index.html', {"itemList": reso})
 
 def parseText(request):
-    chatLogTracker(request.POST.get('submitField'), "text")
-    queryset = request.POST.get('submitField', '').split(" ")
+    #chatLogTracker(request.POST.get('submitField'), "text")
+    #queryset = request.POST.get('submitField', '').split(" ")
+    queryset = request.split(" ")
+    print(queryset, " values")
     combinedQuery = WebResource.objects.none()
 
     #remove punctuation
@@ -58,7 +60,12 @@ def parseText(request):
     updatedQuery = updatedQuery.reverse().order_by("siteID__count")[:3]
 
     #print(list(updatedQuery))
-    listQuery = list(updatedQuery)
+    #listQuery = list(updatedQuery)
+    listQuery = []
+
+    if updatedQuery:
+        for item in updatedQuery:
+            listQuery.append(item["siteName"] + " " + item["siteURL"] + "\n")
 
     singleMessage = Message(sender="bot", description=listQuery)#, myDescription=json.dumps(listQuery))
     singleMessage.save()
@@ -69,21 +76,39 @@ def parseText(request):
     f = Message.objects.filter(sender="bot")
     print("maaaaaaa", f)
 
-    return list(updatedQuery)
+    #return list(updatedQuery)
 
+@csrf_exempt
 def apiAskQuestion(request):
-    #request_json = json.loads(request.body)
+    #return back the message after str storing 1 in the database
+
+    request_json = json.loads(request.body)
     #print(request_json, " hi")
 
-    f = Message.objects.all()
-    print(f)
 
+
+    singleMessage = Message(sender="user", description=request_json["description"])  # , myDescription=json.dumps(listQuery))
+    singleMessage.save()
+    #print(request_json["description"])
+
+    parseText(request_json["description"])
+
+    f = Message.objects.filter(description = request_json, sender="user")
+    f.distinct()
+    #print(f)
+    print("ahhhhhhhhhhhhhhhhh")
     serializer = MessageSerializer(f, many=True)
     print(serializer)
     return JsonResponse(serializer.data, safe=False)
 
     #return JsonResponse({"text": f})
 
+def apiSendData(request):
+    f = Message.objects.all()
+    print(f)
+
+    serializer = MessageSerializer(f, many=True)
+    return JsonResponse(serializer.data, safe=False)
 
 def chatLogTracker(reso, type):
     if type == "text":
