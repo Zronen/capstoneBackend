@@ -65,17 +65,26 @@ def parseText(request):
 
     if updatedQuery:
         for item in updatedQuery:
-            listQuery.append(item["siteName"] + " " + item["siteURL"] + "\n")
+            listQuery.append(item["siteName"])
+            listQuery.append(item["siteURL"])
 
-    singleMessage = Message(sender="bot", description=listQuery)#, myDescription=json.dumps(listQuery))
-    singleMessage.save()
+        if len(listQuery) == 2:
+            singleMessage = Message(sender="bot", description=listQuery, res1=listQuery[0], link1=listQuery[1])#, myDescription=json.dumps(listQuery))
+        if len(listQuery) == 4:
+            singleMessage = Message(sender="bot", description=listQuery, res1=listQuery[0], link1=listQuery[1], res2=listQuery[2], link2=listQuery[3])  # , myDescription=json.dumps(listQuery))
+        if len(listQuery) == 6:
+            singleMessage = Message(sender="bot", description=listQuery, res1=listQuery[0], link1=listQuery[1], res2=listQuery[2], link2=listQuery[3], res3=listQuery[4], link3=listQuery[5])  # , myDescription=json.dumps(listQuery))
+
+        singleMessage.save()
+        return True
 
     #jsonDec = json.decoder.JSONDecoder()
     #myPythonList = jsonDec.decode(Message.myDescription)
 
     f = Message.objects.filter(sender="bot")
-    print("maaaaaaa", f)
+    #print("maaaaaaa", f)
 
+    return False
     #return list(updatedQuery)
 
 @csrf_exempt
@@ -85,18 +94,19 @@ def apiAskQuestion(request):
     request_json = json.loads(request.body)
     #print(request_json, " hi")
 
-
-
     singleMessage = Message(sender="user", description=request_json["description"])  # , myDescription=json.dumps(listQuery))
     singleMessage.save()
     #print(request_json["description"])
 
-    parseText(request_json["description"])
+    if parseText(request_json["description"]) == False:
+
+        singleMessage2 = Message(sender="bot", description="Sorry, I couldn't find a recource based on your query, please try again.")
+        singleMessage2.save()
 
     f = Message.objects.filter(description = request_json, sender="user")
     f.distinct()
     #print(f)
-    print("ahhhhhhhhhhhhhhhhh")
+
     serializer = MessageSerializer(f, many=True)
     print(serializer)
     return JsonResponse(serializer.data, safe=False)
@@ -105,7 +115,7 @@ def apiAskQuestion(request):
 
 def apiSendData(request):
     f = Message.objects.all()
-    print(f)
+    #print(f)
 
     serializer = MessageSerializer(f, many=True)
     return JsonResponse(serializer.data, safe=False)

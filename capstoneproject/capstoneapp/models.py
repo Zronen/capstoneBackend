@@ -20,6 +20,12 @@ class WebResource(models.Model):
 class Message(models.Model):
     sender = models.CharField(max_length=255)
     description = models.CharField(max_length=100000)
+    res1 = models.CharField(max_length=100000, default="")
+    link1 = models.CharField(max_length=100000, default="")
+    res2 = models.CharField(max_length=100000, default="")
+    link2 = models.CharField(max_length=100000, default="")
+    res3 = models.CharField(max_length=100000, default="")
+    link3 = models.CharField(max_length=100000, default="")
     #myDescription = models.TextField(null=True)
 
     #def set_myDescription (self, lst):
