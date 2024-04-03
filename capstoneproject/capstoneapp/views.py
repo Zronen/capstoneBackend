@@ -98,10 +98,19 @@ def apiAskQuestion(request):
     singleMessage.save()
     #print(request_json["description"])
 
-    if parseText(request_json["description"]) == False:
+    rText = request_json["description"]
 
-        singleMessage2 = Message(sender="bot", description="Sorry, I couldn't find a recource based on your query, please try again.")
-        singleMessage2.save()
+    if parseText(rText) == False:
+        rText = re.sub(r'[^\w\s]', '',rText)
+        rText = rText.lower()
+        if rText == "reset":
+            resetMessages()
+        elif rText == "hi" or rText == "hello":
+            singleMessage3 = Message(sender="bot", description="Hello! Please enter a query so I can help you find what you're looking for.")
+            singleMessage3.save()
+        else:
+            singleMessage2 = Message(sender="bot", description="Sorry, I couldn't find a recource based on your query, please try again.")
+            singleMessage2.save()
 
     f = Message.objects.filter(description = request_json, sender="user")
     f.distinct()
@@ -112,6 +121,22 @@ def apiAskQuestion(request):
     return JsonResponse(serializer.data, safe=False)
 
     #return JsonResponse({"text": f})
+
+def resetMessages():
+    allMessages = Message.objects.all()
+    allMessages.delete()
+    singleMessage = Message(sender="bot", description="Hello, I'm NORA! I'm an application that functions a little like google, and can help you find resources relating to navigating online risks as a journalist.")  # , myDescription=json.dumps(listQuery))
+    singleMessage.save()
+    singleMessage2 = Message(sender="bot",description="Make sure to keep your queries straightforward, this will help me direct you to what you're looking for better. If the resources I provide aren't what you're trying to find, feel free to browse the app and look at all our resources there!")  # , myDescription=json.dumps(listQuery))
+    singleMessage2.save()
+    singleMessage3 = Message(sender="bot", description="Here are some sample questions a user can ask: ")
+    singleMessage3.save()
+    singleMessage4 = Message(sender="user", description="What steps can I take to make sure my social media accounts are secure?")
+    singleMessage4.save()
+    singleMessage5 = Message(sender="user", description="How can I protect my privacy and prevent myself from getting doxed?")
+    singleMessage5.save()
+    singleMessage6 = Message(sender="user", description="What can I do if I'm getting online harassment? What steps should I take?")
+    singleMessage6.save()
 
 def apiSendData(request):
     f = Message.objects.all()
